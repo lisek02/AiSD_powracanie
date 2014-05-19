@@ -82,16 +82,17 @@ void hamilton(int value, int *adjmatrix[])
         visitedH[value] = true;
         for(i=0; i<n; i++)
         {
-            if((adjmatrix[value][i]) && (!visitedH[i])) hamilton(i, adjmatrix);
+            if((adjmatrix[value][i] == 1) && (!visitedH[i])) hamilton(i, adjmatrix);
         }
         visitedH[value] = false;
     }
     else
     {
+        printf("wchodzi\n");
         test = false;           //zakladamy brak cyklu
         for(i=0; i<n; i++)
         {
-            if(adjmatrix[value][0] == 1)
+            if(adjmatrix[value][i] == 1)
             {
                 test = true;
                 break;
@@ -172,6 +173,7 @@ int main()
     visitedH = (bool*)malloc(n*sizeof(bool));
     for(i=0; i<n; i++) visitedH[i] = false;
     hamilton(0, adjmatrix30);
+    //for(i=0; i<n; i++) printf("%d",stackH[i]);
 
     //EULER 0.3
     /*
