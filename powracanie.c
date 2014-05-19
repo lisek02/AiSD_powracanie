@@ -18,21 +18,21 @@ void adjmatrix_gen(int n, int *adjmatrix[])     //generowanie macierzy sasiedztw
     }
 
     //Tworzenie cyklu Hamiltona dla n krawedzi:
-    generateHamilton(n,adjmatrix);
+    generateHamilton(n,0,adjmatrix);
 
     //Dopelnianie grafu - ta sama funkcja tylko jako argument przekazujemy roznice m - n
     int remaining = m-n;
     while(remaining>n-1)
     {
-        generateHamilton(n-1,adjmatrix);
+        generateHamilton(n-1,rand()%n,adjmatrix);
         remaining-=(n-1);
     }
-    generateHamilton(remaining,adjmatrix);
+    generateHamilton(remaining,rand()%n,adjmatrix);
 }
 
-void generateHamilton(int range, int *adjmatrix[], int *stack)
+void generateHamilton(int range, int first, int *adjmatrix[])
 {
-    int toRemove = 0, tmp;      //zaczynamy tworzyc cykl od 0
+    int toRemove = first, tmp;      //zaczynamy tworzyc cykl od 0
     int tab[n-1];               //tworzymy tablice n-1 elementow (bez 0)
     for(i=0; i<(n-1); i++) tab[i] = i+1;
 
@@ -168,6 +168,7 @@ int main()
     */
 
     //HAMILTON 0.3
+
     stackH = (int*)malloc(n*sizeof(int));
     stackHcount = 0;
     visitedH = (bool*)malloc(n*sizeof(bool));
@@ -176,22 +177,23 @@ int main()
     //for(i=0; i<n; i++) printf("%d",stackH[i]);
 
     //EULER 0.3
-    /*
+
     stack = (int*)malloc((m+1)*sizeof(int));
     scount = 0;
 
     euler(0, adjmatrix30);
     printf("Cykl eulera: ");
     for(i=0; i<scount; i++) printf("%d ",stack[i]);
-    adjmatrix_print(n, adjmatrix30);*/
+    adjmatrix_print(n, adjmatrix30);
 
+    /*
     //GENEROWANIE I WYŒWIETLANIE GRAFU 0.7
     printf("\n-----0.7-----\n");
     licznik = 0;
     m = 0.7*n*(n-1)/2;
     adjmatrix_gen(n, adjmatrix70);
     adjmatrix_print(n, adjmatrix70);
-    printf("\nliczba krawedzi: %d\n",licznik);
+    printf("\nliczba krawedzi: %d\n",licznik);*/
 
     //EULER 0.7
     /*
