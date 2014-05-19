@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
-int i,j,m,n,licznik;
+int i,j,m,n,licznik,*stack,scount,*stackH,stackHcount;
+bool *visitedH;
 
 void adjmatrix_gen(int n, int *adjmatrix[])     //generowanie macierzy sasiedztwa
 {
@@ -20,15 +22,15 @@ void adjmatrix_gen(int n, int *adjmatrix[])     //generowanie macierzy sasiedztw
 
     //Dopelnianie grafu - ta sama funkcja tylko jako argument przekazujemy roznice m - n
     int remaining = m-n;
-    while(remaining>n)
+    while(remaining>n-1)
     {
-        generateHamilton(n,adjmatrix);
-        remaining-=n;
+        generateHamilton(n-1,adjmatrix);
+        remaining-=(n-1);
     }
     generateHamilton(remaining,adjmatrix);
 }
 
-void generateHamilton(int range, int *adjmatrix[])
+void generateHamilton(int range, int *adjmatrix[], int *stack)
 {
     int toRemove = 0, tmp;      //zaczynamy tworzyc cykl od 0
     int tab[n-1];               //tworzymy tablice n-1 elementow (bez 0)
@@ -58,7 +60,6 @@ void generateHamilton(int range, int *adjmatrix[])
 
 }
 
-
 void adjmatrix_print(int n, int *adjmatrix[])      //wyswietlanie macierzy sasiedztwa
 {
     printf("\nMACIERZ SASIEDZTWA: \n");
@@ -70,6 +71,55 @@ void adjmatrix_print(int n, int *adjmatrix[])      //wyswietlanie macierzy sasie
         }
         printf("\n");
     }
+}
+
+void hamilton(int value, int *adjmatrix[])
+{
+    bool test;
+    stackH[stackHcount++] = value;
+    if (stackHcount < n)
+    {
+        visitedH[value] = true;
+        for(i=0; i<n; i++)
+        {
+            if((adjmatrix[value][i]) && (!visitedH[i])) hamilton(i, adjmatrix);
+        }
+        visitedH[value] = false;
+    }
+    else
+    {
+        test = false;           //zakladamy brak cyklu
+        for(i=0; i<n; i++)
+        {
+            if(adjmatrix[value][0] == 1)
+            {
+                test = true;
+                break;
+            }
+        }
+        if(test) printf("Cykl Hamiltona: ");
+            else printf("Brak cyklu Hamiltona");
+
+        for(i=0; i<stackHcount; i++)
+        {
+            printf("%d",stackH[i]);
+        }
+    }
+    stackHcount--;
+}
+
+void euler(int value, int *adjmatrix[])
+{
+    for(i=0; i<n; i++)
+    {
+        while(adjmatrix[value][i] == 1)
+        {
+            adjmatrix[value][i] = 0;
+            adjmatrix[i][value] = 0;
+            euler(i, adjmatrix);
+        }
+    }
+    stack[scount++] = value;
 }
 
 
@@ -99,16 +149,69 @@ int main()
     {
         adjmatrix70[i] = (int*)malloc(n*sizeof(int));
     }
+
+    //GENEROWANIE I WYŒWIETLANIE GRAFU 0.3
     printf("\n-----0.3-----\n");
     m = 0.3*n*(n-1)/2;
     adjmatrix_gen(n, adjmatrix30);
     adjmatrix_print(n, adjmatrix30);
     printf("\nliczba krawedzi: %d\n",licznik);
 
+    /*TESTOWE USUWANIE JEDNEJ KRAWEDZI
+    int toD, toD2;
+    printf("podaj krawedz do usuniecia: ");
+    scanf("%d",&toD);
+    scanf("%d",&toD2);
+    adjmatrix30[toD][toD2] = 0;
+    adjmatrix30[toD2][toD] = 0;
+    */
+
+    //HAMILTON 0.3
+    stackH = (int*)malloc(n*sizeof(int));
+    stackHcount = 0;
+    visitedH = (bool*)malloc(n*sizeof(bool));
+    for(i=0; i<n; i++) visitedH[i] = false;
+    hamilton(0, adjmatrix30);
+
+    //EULER 0.3
+    /*
+    stack = (int*)malloc((m+1)*sizeof(int));
+    scount = 0;
+
+    euler(0, adjmatrix30);
+    printf("Cykl eulera: ");
+    for(i=0; i<scount; i++) printf("%d ",stack[i]);
+    adjmatrix_print(n, adjmatrix30);*/
+
+    //GENEROWANIE I WYŒWIETLANIE GRAFU 0.7
     printf("\n-----0.7-----\n");
     licznik = 0;
     m = 0.7*n*(n-1)/2;
     adjmatrix_gen(n, adjmatrix70);
     adjmatrix_print(n, adjmatrix70);
     printf("\nliczba krawedzi: %d\n",licznik);
+
+    //EULER 0.7
+    /*
+    stack = (int*)realloc(stack,(m+1)*sizeof(int));
+    scount = 0;
+
+    euler(0, adjmatrix70);
+    printf("Cykl eulera: ");
+    for(i=0; i<scount; i++) printf("%d ",stack[i]);*/
+
+
+
+
+    //ZWALNIANIE PAMIECI
+    for (i=0; i<n; i++)
+    {
+        free(adjmatrix30[i]);
+        free(adjmatrix70[i]);
+    }
+    free(adjmatrix30);
+    free(adjmatrix70);
+    free(stack);
+    free(stackH);
+    free(visitedH);
 }
