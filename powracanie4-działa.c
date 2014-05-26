@@ -64,13 +64,81 @@ void generowanie(int N, int *tab[])
 		}
 	}
 
-        //A to do zadania B - Hamiltona - graf niespójny.
+    //A to do zadania B - Hamiltona - graf niespójny.
 	/*
 	for (int i = 0; i < N; i++)
 	{
 		tab[N-1][i] = 0;
 		tab[i][N-1] = 0;
 	}*/
+
+	free(los);
+
+}
+
+void generowanie_niesp(int N, int *tab[])
+{
+        //zeruję macierz sąsiedztwa
+	int i, j;
+	for (i = 0; i < N; i++)
+	for (j = 0; j < N; j++)
+		tab[i][j] = 0;
+
+        //Dodaję tablicę, w której stworzę jeden pełny cykl Hamiltona.
+	int *los = (int*)malloc(n*sizeof(int));
+
+        //Losuję cykl Hamiltona  (pseudolosowa tablica, w której każdy element występuje tylko jeden raz - gdzieś wcześniej już to tak robiliśmy).
+	int k;
+	for (k = 0; k < N; k++)
+	{
+		los[k] = k;
+	}
+	srand(time(0));
+	int pom, losowa, l;
+	for (l = 0; l < N; l++)
+	{
+		losowa = rand() % N;
+		pom = los[l];
+		los[l] = los[losowa];
+		los[losowa] = pom;
+	}
+
+        //Przepisuję wcześniej otrzymany cykl do macierzy sąsiedztwa.
+	int m;
+	for (m = 0; m < N; m++)
+	{
+		tab[los[m]][los[(m + 1) % N]] = 1;
+		tab[los[(m + 1) % N]][los[m]] = 1;
+	}
+
+
+        //Dopełniam graf do globalnego K krawędzi dodając cykl złożony z 3 jeszcze wierzchołków, pomiędzy którymi nie ma krawędzi i które się nie powtarzają.
+	int wygenerowane = N;
+	while (wygenerowane < K)
+	{
+		int a = rand() % N;
+		int b = rand() % N;
+		int c = rand() % N;
+
+		if (tab[a][b] == 0 && tab[b][c] == 0 && tab[c][a] == 0 && a!=b && b!=c && a!=c)
+		{
+			tab[a][b] = 1;
+			tab[b][a] = 1;
+			tab[b][c] = 1;
+			tab[c][b] = 1;
+			tab[c][a] = 1;
+			tab[a][c] = 1;
+			wygenerowane = wygenerowane + 3;
+		}
+	}
+
+    //A to do zadania B - Hamiltona - graf niespójny.
+
+	for (i = 0; i < N; i++)
+	{
+		tab[N-1][i] = 0;
+		tab[i][N-1] = 0;
+	}
 
 	free(los);
 
@@ -330,6 +398,21 @@ int main()
     for(i=0; i<scount; i++) printf("%d ",stack[i]);
 
 
+/*-----GENEROWANIE I WYŒWIETLANIE GRAFU 0.5-----*/
+
+    printf("\n-----0.7-----\n");
+    licznik = 0;
+    K = 0.5*n*(n-1)/2;
+
+    generowanie_niesp(n, adjmatrix70);
+
+  /*---HAMILTON 0.5---*/
+    stackHcount = 0;
+    for(i=0; i<n; i++) visitedH[i] = false;
+    printf("\n");
+    test = true;
+    hamilton2(0, adjmatrix70);
+    printf("\n");
 
 
     //ZWALNIANIE PAMIECI
